@@ -1,0 +1,13 @@
+{
+    "set": "shapes/set",
+    "sphere": "shapes/sphere",
+    "circle": "shapes/circle",
+    "cone": "shapes/cone",
+    "ellipse": "shapes/ellipse",
+    "ellipsoid": "shapes/ellipsoid",
+    "pixel-art": "converters/pixelart",
+    "permission": "utils/permission",
+    "end": "utils/end",
+    "tpcmd": "utils/tpcmd",
+    "cmds": "utils/cmds"
+}
