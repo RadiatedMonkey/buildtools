@@ -43,17 +43,16 @@ module.exports = function(wss) {
 
         connection.on("message", packet => {
             const res = JSON.parse(packet);
-
-            // if(res.body.statusMessage)
-            //     if(res.body.statusMessage.includes("Too many commands")) console.log(res.body.statusMessage);
-            
-            if(res.body.statusMessage) 
-                console.log(res.body.statusMessage);
+                    
+            // if(res.body.statusMessage) 
+            //     console.log(res.body.statusMessage);
 
             if(res.body.eventName === "PlayerMessage" && res.body.properties.Sender !== "External") {
 
                 const playerMessage = res.body.properties.Message;
                 const sender = res.body.properties.Sender;
+
+                console.log(playerMessage);
 
                 Object.keys(commands).forEach(command => {
                     if(playerMessage.startsWith("!" + command)) {
