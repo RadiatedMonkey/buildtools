@@ -46,9 +46,9 @@ module.exports = function(wss) {
             for(let i = 0, n = uuids.length; i < n; i++) {
                 connection.send(prepareCommand(`kill @e[type=minecraft:armor_stand,tag="bt-${uuids[i]}"]`));
             }
-
-            fs.writeFileSync("./temp/uuids", "");
         }
+        if(!fs.existsSync("./temp")) fs.mkdirSync("./temp");
+        fs.writeFileSync("./temp/uuids", "");
         
         connection.send(prepareCommand('tellraw @a {"rawtext":[{"text":"[BuildTools] Use !cmds to get a list of WorldEdit commands"}]}'));
         subscribe(connection, "PlayerMessage");

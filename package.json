@@ -1,17 +1,16 @@
 {
-  "name": "WorldEdit",
+  "name": "mc-buildtools",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index"
   },
   "keywords": [],
-  "author": "",
+  "author": "RadiatedMonkey <https://github.com/RadiatedMonkey>",
   "license": "ISC",
   "dependencies": {
     "chalk": "^2.4.2",
-    "image-average-color": "^1.0.0",
     "jimp": "^0.8.5",
     "uuid": "^3.3.3",
     "ws": "^7.2.0"
