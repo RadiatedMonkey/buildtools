@@ -1,5 +1,5 @@
-module.exports = function(arguments) {
-    let {length, width} = arguments;
+module.exports = function(args) {
+    let {length, width} = args;
 
     let coords = [];
     for (let i = -length; i <= length; i++) {

@@ -1,7 +1,7 @@
-module.exports = function(arguments) {
+module.exports = function(args) {
 
     let coords = [];
-    let {height, radius} = arguments;
+    let {height, radius} = args;
 
 
     for(let m = height; m >= 0; m--) {

@@ -1,9 +1,9 @@
-module.exports = function(arguments) {
+module.exports = function(args) {
     let {
         width,
         height,
         length
-    } = arguments;
+    } = args;
 
     let coords = [];
     for(let i = -length; i <= length; i++) {

@@ -1,7 +1,7 @@
-module.exports = function(arguments) {
-    let blocks = generateBlocks(arguments.radius);
+module.exports = function(args) {
+    let blocks = generateBlocks(args.radius);
 
-    if (!arguments.fill) {
+    if (!args.fill) {
         blocks = purgeBlocks(blocks);
     }
 

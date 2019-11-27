@@ -45,32 +45,83 @@ module.exports = function(ws, res) {
         });
     });
 
-    function imageEffect(image, effects) {
-        
-        
+    function imageEffect(image) {
+        filters = filters.split(",").map(function(x) {
+            // -> "invert()", "convolute(example)"
+
+            let tempX = x.split("(");
+            return [tempX[0], tempX[1].replace(")", "")];
+        });
+
+        for(let i = 0, n = filters.length; i < n; i++) {
+            switch(filters[i][0]) {
+                case 'greyscale':
+                    image.greyscale();
+                    break;
+                
+                case 'invert':
+                    image.invert();
+                    break;
+
+                case 'dither':
+                    image.dither565();
+                    break;
+
+                case 'normalize':
+                    image.normalize();
+                    break;
+                
+                case 'blur':
+                    const fArg = Number(filters[i][1]);
+                    if(isNaN(fArg))
+                        commandError("The blur filter should receive a number");
+                    else
+                        image.blur(fArg);
+                    break;
+
+                case 'sepia':
+                    image.sepia();
+                    break;
+
+                case 'opaque':
+                    image.opaque();
+                    break;
+
+                case 'gaussian':
+                    const gArg = Number(filters[i][1]);
+                    if(isNaN(gArg))
+                        commandError("The gaussian blur filter should receive a number");
+                    else
+                        image.gaussian(gArg);
+                    break;
+
+                case 'posterize':
+                    const pArg = Number(filters[i][1]);
+                    if(isNaN(pArg))
+                        commandError("The posterize filter should receive a number");
+                    else
+                        image.posterize(pArg);
+                    break;
+
+                default:
+                    commandError(ws, res.properties.Sender, `Unknown image filter: '${filters[i][0]}'`);
+                    break;
+            }
+        }
 
     }
 
     function useImage(imageBuffer) {
         isVertical ? isVertical = isVertical === "true" ? true : false : null;
 
-        // let size = sizeOf(imageBuffer);        
-
         Jimp.read(imageBuffer, function(err, image) {
             if(err) throw err;
 
             isVertical ? image.flip(false, true) : null;
-
-            // if(newWidth) {
-            //     let scaleDifference = newWidth / size.width;
-            //     image.scale(scaleDifference);
-            //     size.width *= scaleDifference;
-            //     size.height *= scaleDifference;
-            // }
-
-            // image.contain(newWidth, newHeight);
             image.scaleToFit(newWidth, newHeight, Jimp.RESIZE_BILINEAR);
-            // image.dither565();
+
+            if(filters)
+                imageEffect(image);
 
             let pixels = [];
             for(let x = 0; x < image.bitmap.width; x++) {
@@ -93,22 +144,11 @@ module.exports = function(ws, res) {
             let blockKeys = Object.keys(blocks);
             pixels.forEach(function(pixel, idx) {
                 let distances = [];
-                // blockKeys.forEach(function(key) {
-                //     distances.push(colorDifference(pixel, blocks[key]));
-                // });
-
                 for(let i = 0, n = blockKeys.length; i < n; i++) {
                     distances.push(colorDifference(pixel, blocks[blockKeys[i]]));
                 }
 
                 let min = 0;
-                // distances.forEach(function(distance, idx) {
-                //     if(distance < min.val) {
-                //         min.val = distance;
-                //         min.idx = idx;
-                //     }
-                // });
-
                 for(let i = 0, n = distances.length; i < n; i++) {
                     if(distances[i] < distances[min])
                         min = i;

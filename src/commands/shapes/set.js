@@ -9,9 +9,9 @@ module.exports = function(ws, res) {
     // args -> x y z block
 
     let coords = [];
-    for(let x = 0; x < Number(args[0]); x++) {
-        for(let y = 0; y < Number(args[1]); y++) {
-            for(let z = 0; z < Number(args[2]); z++) {
+    for(let x = 0, i = Number(args[0]); x < i; x++) {
+        for(let y = 0, j = Number(args[1]); y < j; y++) {
+            for(let z = 0, k = Number(args[2]); z < k; z++) {
                 coords.push([x, y, z]);
             }
         }
