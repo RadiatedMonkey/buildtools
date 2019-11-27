@@ -24,7 +24,13 @@ module.exports = function(ws, res) {
     newWidth = Number(newWidth);
     newHeight = Number(newHeight);
 
-    // Download image
+    // Pixel art will only be placed when this is true
+    let success = true;
+
+    if(!imgUrl) return commandError(ws, res.properties.Sender, "An image location is required");
+    if(isNaN(newWidth)) return commandError(ws, res.properties.Sender, "An image with is required");
+    if(isNaN(newHeight)) return commandError(ws, res.properties.Sender, "An image height is required");
+    if(!isVertical) isVertical = true;
     
     if(imgUrl.startsWith("http://")) protocol = http;
     else if(imgUrl.startsWith("https://")) protocol = https;
@@ -37,6 +43,9 @@ module.exports = function(ws, res) {
         response.on("data", function(chunk) {
             chunks.push(chunk);
             console.log(chunk.byteLength);
+        }).on('error', function(err) {
+            success = false;
+            commandError(ws, res.properties.Sender, "Failed to load image");
         }).on("end", function() {
             ws.send(prepareCommand(`tellraw ${res.properties.Sender} {"rawtext":[{"text":"[BuildTools] Processing image..."}]}`));
             const buffer = Buffer.concat(chunks);
@@ -47,8 +56,6 @@ module.exports = function(ws, res) {
 
     function imageEffect(image) {
         filters = filters.split(",").map(function(x) {
-            // -> "invert()", "convolute(example)"
-
             let tempX = x.split("(");
             return [tempX[0], tempX[1].replace(")", "")];
         });
@@ -74,7 +81,7 @@ module.exports = function(ws, res) {
                 case 'blur':
                     const fArg = Number(filters[i][1]);
                     if(isNaN(fArg))
-                        commandError("The blur filter should receive a number");
+                        commandError(ws, res.properties.Sender, "The blur filter should receive a number");
                     else
                         image.blur(fArg);
                     break;
@@ -90,7 +97,7 @@ module.exports = function(ws, res) {
                 case 'gaussian':
                     const gArg = Number(filters[i][1]);
                     if(isNaN(gArg))
-                        commandError("The gaussian blur filter should receive a number");
+                        commandError(ws, res.properties.Sender, "The gaussian blur filter should receive a number");
                     else
                         image.gaussian(gArg);
                     break;
@@ -98,7 +105,7 @@ module.exports = function(ws, res) {
                 case 'posterize':
                     const pArg = Number(filters[i][1]);
                     if(isNaN(pArg))
-                        commandError("The posterize filter should receive a number");
+                        commandError(ws, res.properties.Sender, "The posterize filter should receive a number");
                     else
                         image.posterize(pArg);
                     break;
@@ -115,10 +122,14 @@ module.exports = function(ws, res) {
         isVertical ? isVertical = isVertical === "true" ? true : false : null;
 
         Jimp.read(imageBuffer, function(err, image) {
-            if(err) throw err;
+            if(err) {
+                commandError(ws, res.properties.Sender, err);
+                console.log(err);
+                return;
+            }
 
             isVertical ? image.flip(false, true) : null;
-            image.scaleToFit(newWidth, newHeight, Jimp.RESIZE_BILINEAR);
+            image.scaleToFit(newWidth, newHeight, Jimp.RESIZE_HERMITE);
 
             if(filters)
                 imageEffect(image);
@@ -126,7 +137,9 @@ module.exports = function(ws, res) {
             let pixels = [];
             for(let x = 0; x < image.bitmap.width; x++) {
                 for(let y = 0; y < image.bitmap.height; y++) {
-                    pixels.push(Jimp.intToRGBA(image.getPixelColor(x, y)));
+                    let pxColor = Jimp.intToRGBA(image.getPixelColor(x, y));
+                    if(pxColor.a < 0.5) continue;
+                    pixels.push(pxColor);
                     positions.push([[x, isVertical ? y : 0, isVertical ? 0 : y]]);
                 }
             }
@@ -144,25 +157,29 @@ module.exports = function(ws, res) {
             let blockKeys = Object.keys(blocks);
             pixels.forEach(function(pixel, idx) {
                 let distances = [];
-                for(let i = 0, n = blockKeys.length; i < n; i++) {
-                    distances.push(colorDifference(pixel, blocks[blockKeys[i]]));
+
+                if(pixel !== null) {
+
+                    for(let i = 0, n = blockKeys.length; i < n; i++) {
+                        distances.push(colorDifference(pixel, blocks[blockKeys[i]]));
+                    }
+
+                    let min = 0;
+                    for(let i = 0, n = distances.length; i < n; i++) {
+                        if(distances[i] < distances[min])
+                            min = i;
+                    }
+
+                    let block = blockKeys[min];
+                    if(block.includes(" ")) block = block.split(" ");
+                    else block = [block, 0];
+
+                    positions[idx][1] = block;
+
                 }
-
-                let min = 0;
-                for(let i = 0, n = distances.length; i < n; i++) {
-                    if(distances[i] < distances[min])
-                        min = i;
-                }
-
-                let block = blockKeys[min];
-                if(block.includes(" ")) block = block.split(" ");
-                else block = [block, 0];
-
-                positions[idx][1] = block;
             });
 
-            // ws.send(prepareCommand(`fill ~~~ ~${image.bitmap.width}~${image.bitmap.height}~ `));
-            ws.send(prepareCommand(`tellraw ${res.properties.Sender} {"rawtext":[{"text":"[PixelArt] Placing pixel art..."}]}`));
+            ws.send(prepareCommand(`tellraw ${res.properties.Sender} {"rawtext":[{"text":"[BuildTools] Placing pixel art..."}]}`));
             blockSetter(ws, positions, res.properties.Sender);
 
             positions = [];

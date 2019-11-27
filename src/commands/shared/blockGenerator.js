@@ -14,19 +14,23 @@ module.exports = function(positions, blockArg) {
 
     let blockList = [];
     blockArg.forEach(function(block) {
-        for(let i = 0; i < positions.length * (block[0] / 100); i++) {
+        // for(let i = 0; i < positions.length * (block[0] / 100); i++) {
+        //     blockList.push([block[1], block[2]]);
+        // }
+
+        for(let i = 0, n = positions.length * (block[0] / 100); i < n; i++) {
             blockList.push([block[1], block[2]]);
         }
     });
 
     blockList = shuffle(blockList);
 
-    console.log(positions.length, blockList.length);
-
     let finalList = [];
-    positions.forEach(function(position, idx) {
-        finalList.push([position, blockList[idx]]);
-    });
+    
+    for(let i = 0, n = positions.length; i < n; i++) {
+        if(blockList[i][0] === "nothing") continue;
+        finalList.push([positions[i], blockList[i]]);
+    }
 
     return finalList;
 

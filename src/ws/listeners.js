@@ -1,3 +1,4 @@
+const fs = require("fs");
 const path = require("path");
 const subscribe = require("./subscribe");
 const prepareCommand = require("../commands/commandGenerator");
@@ -40,14 +41,20 @@ module.exports = function(wss) {
         process.stdout.cursorTo(0);
         console.log(chalk.green("✓") + " Connection established");
 
+        if(fs.existsSync("./temp/uuids")) {
+            const uuids = fs.readFileSync("./temp/uuids", "UTF-8").split("\n");
+            for(let i = 0, n = uuids.length; i < n; i++) {
+                connection.send(prepareCommand(`kill @e[type=minecraft:armor_stand,tag="bt-${uuids[i]}"]`));
+            }
+
+            fs.writeFileSync("./temp/uuids", "");
+        }
+        
         connection.send(prepareCommand('tellraw @a {"rawtext":[{"text":"[BuildTools] Use !cmds to get a list of WorldEdit commands"}]}'));
         subscribe(connection, "PlayerMessage");
 
         connection.on("message", packet => {
             const res = JSON.parse(packet);
-                    
-            // if(res.body.statusMessage) 
-            //     console.log(res.body.statusMessage);
 
             if(res.body.hasOwnProperty("statusMessage")) {
                 if(res.body.statusMessage.startsWith("Too many commands") && !tooFastLogged) {

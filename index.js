@@ -11,19 +11,11 @@ const loader = setInterval(function() {
     idx &= 3;
 }, 100);
 
-function start() {
-    wss = new WebSocket.Server({
-        port: 19131
-    });
-    clearInterval(loader);
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
-    console.log(chalk.green("✓") + " Server running on ws://localhost:19131");
-    listeners(wss);
-}
-
-function close() {
-    wss.close();
-}
-
-start();
+wss = new WebSocket.Server({
+    port: 19131
+});
+clearInterval(loader);
+process.stdout.clearLine();
+process.stdout.cursorTo(0);
+console.log(chalk.green("✓") + " Server running on ws://localhost:19131");
+listeners(wss);
