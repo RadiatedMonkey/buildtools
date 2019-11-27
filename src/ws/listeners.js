@@ -7,6 +7,8 @@ const permission = require("../commands/shared/permission");
 const commands = require("../../data/commands.json");
 const loadedCommands = {};
 
+let tooFastLogged = false;
+
 module.exports = function(wss) {
 
     let idx = 0;
@@ -38,7 +40,7 @@ module.exports = function(wss) {
         process.stdout.cursorTo(0);
         console.log(chalk.green("✓") + " Connection established");
 
-        connection.send(prepareCommand('tellraw @a {"rawtext":[{"text":"[WorldEdit] Use !cmds to get a list of WorldEdit commands"}]}'));
+        connection.send(prepareCommand('tellraw @a {"rawtext":[{"text":"[BuildTools] Use !cmds to get a list of WorldEdit commands"}]}'));
         subscribe(connection, "PlayerMessage");
 
         connection.on("message", packet => {
@@ -46,6 +48,13 @@ module.exports = function(wss) {
                     
             // if(res.body.statusMessage) 
             //     console.log(res.body.statusMessage);
+
+            if(res.body.hasOwnProperty("statusMessage")) {
+                if(res.body.statusMessage.startsWith("Too many commands") && !tooFastLogged) {
+                    connection.send(prepareCommand(`tellraw @a {"rawtext":[{"text":"[BuildTools] Commands are being sent too fast, the host might need to increase the command_delay in config/general.json"}]}`));
+                    tooFastLogged = true;
+                }
+            }
 
             if(res.body.eventName === "PlayerMessage" && res.body.properties.Sender !== "External") {
 
@@ -63,7 +72,7 @@ module.exports = function(wss) {
                             loadedCommands[command] = require(path.join(__dirname, "../commands", commands[command]));
                             loadedCommands[command](connection, res.body);
                         } else {
-                            connection.send(prepareCommand(tellraw(sender, "You do not have permission to use this command")));
+                            connection.send(prepareCommand(tellraw(sender, "[BuildTools] You do not have permission to use this command")));
                         }
                     }
                 });

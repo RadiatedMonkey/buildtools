@@ -21,8 +21,7 @@ module.exports = {
         let id = module.exports.armourStands[user];
         ws.send(prepareCommand(`execute @e[type=minecraft:armor_stand,tag=${id},c=1] ~~~ fill ~~-1~ ~~-1~ air 0 replace barrier`));
         ws.send(prepareCommand(`kill @e[type=minecraft:armor_stand,tag=${id},c=1]`));
-        ws.send(prepareCommand(`title \"${user}\" actionbar Command finished`));
-        ws.send(prepareCommand(`execute \"${user}\" ~~~ playsound random.orb @s ~~~ 1 0.5`));
+        ws.send(prepareCommand(`execute \"${user}\" ~~~ playsound mob.pig.boost @s ~~~`));
         delete module.exports.armourStands[user];
         console.log(chalk.cyan("!") + ` Process ${id} finished`);
     }
