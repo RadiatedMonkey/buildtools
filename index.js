@@ -1,9 +1,10 @@
 const WebSocket = require("ws");
 const listeners = require("./src/ws/listeners");
 const chalk = require("chalk");
-let wss = null;
 
+let wss = null;
 let idx = 0;
+
 const loader = setInterval(function() {
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
@@ -14,6 +15,7 @@ const loader = setInterval(function() {
 wss = new WebSocket.Server({
     port: 19131
 });
+
 clearInterval(loader);
 process.stdout.clearLine();
 process.stdout.cursorTo(0);

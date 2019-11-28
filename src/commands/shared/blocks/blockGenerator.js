@@ -1,6 +1,6 @@
 "use strict";
 
-const shuffle = require("./shuffle");
+const shuffle = require("../shuffle");
 
 module.exports = function(positions, blockArg) {
 

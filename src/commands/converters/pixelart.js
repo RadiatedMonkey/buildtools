@@ -1,11 +1,10 @@
-// Syntax -> !pixel-art <url> <size> <vertical>
-
 const url = require("url");
 const https = require("https");
 const http = require("http");
+
 const Jimp = require("jimp");
 const blocks = require("../../../data/blocks.json");
-const blockSetter = require("../shared/blockSetter");
+const blockSetter = require("../shared/blocks/blockSetter");
 const prepareCommand = require("../commandGenerator");
 const commandError = require("../commandError");
 
@@ -124,7 +123,6 @@ module.exports = function(ws, res) {
         Jimp.read(imageBuffer, function(err, image) {
             if(err) {
                 commandError(ws, res.properties.Sender, err);
-                console.log(err);
                 return;
             }
 

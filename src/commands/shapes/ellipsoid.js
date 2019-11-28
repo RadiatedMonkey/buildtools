@@ -1,6 +1,6 @@
 const ellipsoid = require("../shared/shapes/ellipsoidGenerator");
-const generateBlocks = require("../shared/blockGenerator");
-const blockSetter = require("../shared/blockSetter");
+const generateBlocks = require("../shared/blocks/blockGenerator");
+const blockSetter = require("../shared/blocks/blockSetter");
 
 module.exports = function(ws, res) {
     const args = res.properties.Message.split(" ").slice(1);

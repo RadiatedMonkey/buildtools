@@ -1,4 +1,5 @@
 const uuid = require("uuid/v4");
+
 module.exports = function(ws, eventName) {
     ws.send(JSON.stringify({
         "body": {

@@ -1,15 +1,9 @@
-const positions = require("./positions");
-const prepareCommand = require("../commandGenerator");
-const config = require("../../../config/general.json");
+const positions = require("../positions");
+const prepareCommand = require("../../commandGenerator");
+const config = require("../../../../config/general.json");
 
 let blocksPlaced = {};
 let commandIntervals = {};
-
-// Format ->
-// [
-//     [x, y, z],
-//     [name, dv]
-// ]
 
 module.exports = function(ws, blocks, sender) {
     positions.savePosition(ws, sender);
