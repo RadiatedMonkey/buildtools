@@ -1,3 +1,2 @@
-REM Make sure the pkg NPM module is installed globally
-
+@echo off
 CALL pkg . --out-path ./build 

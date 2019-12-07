@@ -9,7 +9,7 @@ if(!fs.existsSync("./config/permissions.json")) {
     Object.keys(commands).forEach(function(command) {
         permissions[command] = null
     });
-    console.log(chalk.cyan("!") + " No permission configuration file");
+    console.log(chalk.bgYellow.black(" WARNING ") + " No permission configuration file");
 } else {
     fs.readFile("./config/permissions.json", "UTF-8", function(err, data) {
         if(err) console.log(err);
@@ -25,14 +25,14 @@ if(!fs.existsSync("./config/permissions.json")) {
                     permissions[commandList[j]] = data[commandList[j]];
                 
                 else if(dType !== "undefined")
-                    console.log(`${chalk.red("X")} The permission '${commandList[j]} has an invalid data type (${dType})'`);
+                    console.log(`${chalk.bgRed(" ERROR ")} The permission '${commandList[j]} has an invalid data type (${dType})'`);
                 
                 else
                     permissions[commandList[j]] = null;
             }
         }
 
-        console.log(chalk.green("✓") + " Permissions loaded");
+        console.log("Permissions loaded");
     });
 }
 
