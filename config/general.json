@@ -1,3 +1,6 @@
 {
-    "command_delay": 4
+    "command_delay": 4,
+    "function_delay": 1,
+    "functionpack_location": "C:/Users/ruben/AppData/Local/Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang/behavior_packs/buildtools_quickbuild/functions",
+    "useQuickbuild": true
 }

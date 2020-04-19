@@ -4,13 +4,12 @@ const WebSocket = require("ws");
 const listeners = require("./src/ws/listeners");
 const chalk = require("chalk");
 
-if(!fs.existsSync("./temp")) fs.mkdir("./temp");
+if(!fs.existsSync("./temp")) fs.mkdirSync("./temp");
 if(!fs.existsSync("./temp/uuids")) fs.writeFileSync("./temp/uuids", "");
 if(!fs.existsSync("./temp/errors.log")) fs.writeFileSync("./temp/errors.log", "");
 
 let wss = null;
 let idx = 0;
-
 
 
 const loader = setInterval(function() {

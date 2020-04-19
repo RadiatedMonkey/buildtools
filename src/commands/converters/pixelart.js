@@ -5,6 +5,8 @@ const http = require("http");
 const Jimp = require("jimp");
 const blocks = require("../../../data/blocks.json");
 const blockSetter = require("../shared/blocks/blockSetter");
+const generateFunctions = require("../shared/blocks/functionGenerator");
+const config = require("../../../config/general.json");
 const prepareCommand = require("../commandGenerator");
 const commandError = require("../commandError");
 
@@ -51,8 +53,8 @@ module.exports = function(ws, res) {
 
     function imageEffect(image) {
 
-        if(!(/([A-z]{4,}\((|[0-9]{1,})\)){1,})/gi).test(filters))
-            return commandError(ws, res.properties.Sender, "The filters argument has invalid syntax, filters have been skipped");
+        // if(!(/([A-Za-z]{4,}\((|[0-9])\)){1,}/gi).test(filters))
+        //     return commandError(ws, res.properties.Sender, "The filters argument has invalid syntax, filters have been skipped");
 
         filters = filters.split(",").map(function(x) {
             let tempX = x.split("(");
@@ -163,8 +165,8 @@ module.exports = function(ws, res) {
                 }
             });
 
-            ws.send(prepareCommand(`tellraw ${res.properties.Sender} {"rawtext":[{"text":"[BuildTools] Placing pixel art..."}]}`));
-            blockSetter(ws, positions, res.properties.Sender);
+            if(config.useQuickbuild) generateFunctions(ws, null, positions, res.properties.Sender, true);
+            else blockSetter(ws, positions, res.properties.Sender);
 
             // Cleanup
             positions = [];

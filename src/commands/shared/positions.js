@@ -16,8 +16,6 @@ module.exports = {
         ws.send(prepareCommand(`execute \"${user}\" ~~~ setblock ~~-1~ barrier 0 keep`));
         ws.send(prepareCommand(`execute \"${user}\" ~~~ summon minecraft:armor_stand`));
         ws.send(prepareCommand(`execute \"${user}\" ~~~ tag @e[type=minecraft:armor_stand,c=1] add "bt-${id}"`));
-        ws.send(prepareCommand(`execute \"${user}\" ~~~ effect @e[type=minecraft:armor_stand,tag="bt-${id}"] invisibility 999999 255 true`));
-        ws.send(prepareCommand(`execute \"${user}\" ~~~ effect @e[type=minecraft:armor_stand,tag="bt-${id}"] instant_health 999999 255 true`));
         console.log(chalk.bgCyan(" INFO ") + ` Process ${id} started`);
     },
 

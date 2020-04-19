@@ -67,6 +67,7 @@ module.exports = {
             connection.on("message", packet => {
                 const res = JSON.parse(packet);
                 if(res.body.hasOwnProperty("statusMessage")) {
+                    console.log(res.body.statusMessage);
                     if(res.body.statusMessage.startsWith("Too many commands") && !tooFastLogged) {
                         connection.send(prepareCommand(`tellraw @a {"rawtext":[{"text":"§c[BuildTools] Commands are being sent too fast, the host might need to increase the command_delay in config/general.json"}]}`));
                         tooFastLogged = true;

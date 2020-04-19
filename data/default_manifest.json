@@ -1,0 +1,24 @@
+{
+    "format_version": 2,
+    "header": {
+        "description": "Function pack for Buildtools, required for QuickBuild",
+        "name": "BuildTools QuickBuild",
+        "uuid": "3db23f67-04bf-482f-aa18-7c3d663ec6be",
+        "version": [ 0, 0, 1 ],
+        "min_engine_version": [ 1, 14, 0 ]
+    },
+    "modules": [
+        {
+            "description": "Function pack for Buildtools, required for QuickBuild",
+            "type": "data",
+            "uuid": "5cf70968-a469-4c97-aa8e-600032c36332",
+            "version": [0, 0, 1]
+        }
+    ],
+    "dependencies": [
+        {
+            "uuid": "6e1cac15-d570-4039-9f60-b3b96992c240",
+            "version": [0, 0, 1]
+        }
+    ]
+}
