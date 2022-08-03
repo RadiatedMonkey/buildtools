@@ -5,7 +5,7 @@ const config = require("../../../config/general.json");
 
 module.exports = function(ws, res) {
 
-    const msg = res.properties.Message;
+    const msg = res.body.message;
     let args = msg.split(" ").slice(1);
 
     let coords = [];
@@ -17,9 +17,9 @@ module.exports = function(ws, res) {
         }
     }
 
-    if(config.useQuickbuild) generateFunctions(ws, coords, args[args.length - 1], res.properties.Sender);
+    if(config.useQuickbuild) generateFunctions(ws, coords, args[args.length - 1], res.body.sender);
     else {
         const blocks = generateBlocks(coords, args[args.length - 1]);
-        blockSetter(ws, blocks, res.properties.Sender);
+        blockSetter(ws, blocks, res.body.sender);
     }
 }

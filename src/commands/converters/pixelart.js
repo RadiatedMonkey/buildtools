@@ -13,7 +13,7 @@ const commandError = require("../commandError");
 let positions = [];
 
 module.exports = function(ws, res) {
-    const args = res.properties.Message.split(" ").slice(1);
+    const args = res.body.message.split(" ").slice(1);
     let [
         imgUrl,
         newWidth,
@@ -25,26 +25,26 @@ module.exports = function(ws, res) {
     newWidth = Number(newWidth);
     newHeight = Number(newHeight);
 
-    if(!imgUrl) return commandError(ws, res.properties.Sender, "An image location is required");
-    if(isNaN(newWidth)) return commandError(ws, res.properties.Sender, "An image width is required");
-    if(isNaN(newHeight)) return commandError(ws, res.properties.Sender, "An image height is required");
+    if(!imgUrl) return commandError(ws, res.body.sender, "An image location is required");
+    if(isNaN(newWidth)) return commandError(ws, res.body.sender, "An image width is required");
+    if(isNaN(newHeight)) return commandError(ws, res.body.sender, "An image height is required");
     if(!isVertical) isVertical = true;
 
     if(imgUrl.startsWith("http://")) protocol = http;
     else if(imgUrl.startsWith("https://")) protocol = https;
-    else return commandError(ws, res.properties.Sender, "Unrecognized image url protocol, the url must start with http:// or https://");
+    else return commandError(ws, res.body.sender, "Unrecognized image url protocol, the url must start with http:// or https://");
 
-    ws.send(prepareCommand(`tellraw ${res.properties.Sender} {"rawtext":[{"text":"[BuildTools] Downloading image..."}]}`));
+    ws.send(prepareCommand(`tellraw ${res.body.sender} {"rawtext":[{"text":"[BuildTools] Downloading image..."}]}`));
     protocol.get(url.parse(imgUrl), function(response) {
         let chunks = [];
 
         response.on("data", function(chunk) {
             chunks.push(chunk);
         }).on('error', function(err) {
-            commandError(ws, res.properties.Sender, "Failed to load image");
+            commandError(ws, res.body.sender, "Failed to load image");
             console.error(err);
         }).on("end", function() {
-            ws.send(prepareCommand(`tellraw ${res.properties.Sender} {"rawtext":[{"text":"[BuildTools] Processing image..."}]}`));
+            ws.send(prepareCommand(`tellraw ${res.body.sender} {"rawtext":[{"text":"[BuildTools] Processing image..."}]}`));
             const buffer = Buffer.concat(chunks);
             chunks = [];
             useImage(buffer);
@@ -54,7 +54,7 @@ module.exports = function(ws, res) {
     function imageEffect(image) {
 
         // if(!(/([A-Za-z]{4,}\((|[0-9])\)){1,}/gi).test(filters))
-        //     return commandError(ws, res.properties.Sender, "The filters argument has invalid syntax, filters have been skipped");
+        //     return commandError(ws, res.body.sender, "The filters argument has invalid syntax, filters have been skipped");
 
         filters = filters.split(",").map(function(x) {
             let tempX = x.split("(");
@@ -82,7 +82,7 @@ module.exports = function(ws, res) {
                 case 'blur':
                     const fArg = Number(filters[i][1]);
                     if(isNaN(fArg))
-                        commandError(ws, res.properties.Sender, "The blur filter should receive a number, it has been skipped");
+                        commandError(ws, res.body.sender, "The blur filter should receive a number, it has been skipped");
                     else
                         image.blur(fArg);
                     break;
@@ -98,7 +98,7 @@ module.exports = function(ws, res) {
                 case 'gaussian':
                     const gArg = Number(filters[i][1]);
                     if(isNaN(gArg))
-                        commandError(ws, res.properties.Sender, "The gaussian blur filter should receive a number, it has been skipped");
+                        commandError(ws, res.body.sender, "The gaussian blur filter should receive a number, it has been skipped");
                     else
                         image.gaussian(gArg);
                     break;
@@ -106,13 +106,13 @@ module.exports = function(ws, res) {
                 case 'posterize':
                     const pArg = Number(filters[i][1]);
                     if(isNaN(pArg))
-                        commandError(ws, res.properties.Sender, "The posterize filter should receive a number, it has been skipped");
+                        commandError(ws, res.body.sender, "The posterize filter should receive a number, it has been skipped");
                     else
                         image.posterize(pArg);
                     break;
 
                 default:
-                    commandError(ws, res.properties.Sender, `Unknown image filter: '${filters[i][0]}', it has been skipped`);
+                    commandError(ws, res.body.sender, `Unknown image filter: '${filters[i][0]}', it has been skipped`);
                     break;
             }
         }
@@ -122,7 +122,7 @@ module.exports = function(ws, res) {
         isVertical ? isVertical = isVertical === "true" ? true : false : null;
         Jimp.read(imageBuffer, function(err, image) {
             if(err) {
-                commandError(ws, res.properties.Sender, err);
+                commandError(ws, res.body.sender, err);
                 return;
             }
             isVertical ? image.flip(false, true) : null;
@@ -165,8 +165,8 @@ module.exports = function(ws, res) {
                 }
             });
 
-            if(config.useQuickbuild) generateFunctions(ws, null, positions, res.properties.Sender, true);
-            else blockSetter(ws, positions, res.properties.Sender);
+            if(config.useQuickbuild) generateFunctions(ws, null, positions, res.body.sender, true);
+            else blockSetter(ws, positions, res.body.sender);
 
             // Cleanup
             positions = [];
