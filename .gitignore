@@ -3,3 +3,5 @@ node_modules
 temp
 build
 data/textures
+package-lock.json
+.idea

@@ -8,6 +8,8 @@ const generateBlockList = require("../blocks/blockListGenerator");
 
 module.exports = function(ws, positions, blockList, player, listAlreadyGenerated = false) {
     fs.readdirSync(config.functionpack_location).forEach(function(file) {
+        if(file === "functions") return;
+
         fs.writeFileSync(config.functionpack_location + "/" + file, "");
     });
 

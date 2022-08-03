@@ -23,23 +23,28 @@ module.exports = {
             process.stdout.cursorTo(0);
             process.stdout.write("Waiting for connection" + chalk.cyan(
                 [
-                    ".  ",
-                    ".. ",
-                    "...",
-                    " ..",
-                    "  .",
-                    "  .",
-                    " ..",
-                    "...",
-                    ".. ",
-                    ".  "
+                    // ".  ",
+                    // ".. ",
+                    // "...",
+                    // " ..",
+                    // "  .",
+                    // "  .",
+                    // " ..",
+                    // "...",
+                    // ".. ",
+                    // ".  "
+                    " | ",
+                    " / ",
+                    " - ",
+                    " \\ ",
                 ][idx++]
-            ) + "\t" + chalk.bold.cyan("Use /connect localhost:19131 to connect to the WorldEdit server"));
-            idx > 8 ? idx = 0 : null;
+            ) + " \t" + chalk.bold.cyan("Use /connect localhost:19131 to connect to the WorldEdit server"));
+            idx > 3 ? idx = 0 : null;
         }, 200);
         wss.on("connection", connection => {
             if(!exceptionListenerAdded) {
                 process.on("uncaughtException", function(err) {
+                    console.error(err);
                     commandError(connection, "@a", "BuildTools crashed, reconnect with /connect localhost:19131");
                     logger(err);
                     setTimeout(function() {
@@ -66,6 +71,7 @@ module.exports = {
             subscribe(connection, "PlayerMessage");
             connection.on("message", packet => {
                 const res = JSON.parse(packet);
+
                 if(res.body.hasOwnProperty("statusMessage")) {
                     console.log(res.body.statusMessage);
                     if(res.body.statusMessage.startsWith("Too many commands") && !tooFastLogged) {
@@ -73,24 +79,34 @@ module.exports = {
                         tooFastLogged = true;
                     }
                 }
-                if(res.body.eventName === "PlayerMessage" && res.body.properties.Sender !== "External" && res.body.properties.Message.startsWith("!")) {
+
+                if(res.body.type === "chat" && res.body.sender !== "External" && res.body.message.startsWith("!")) {
+
                     let commandFound = false;
-                    if(positions.armourStands[res.body.properties.Sender] && !res.body.properties.Message.startsWith("!end"))
-                        return commandError(connection, res.body.properties.Sender, "You are already executing a command, end it with !end");
+                    if(positions.armourStands[res.body.sender] && !res.body.message.startsWith("!end"))
+                        return commandError(connection, res.body.sender, "You are already executing a command, end it with !end");
+
                     Object.keys(commands).forEach(command => {
-                        if(res.body.properties.Message.startsWith("!" + command)) {
+
+                        if(res.body.message.startsWith("!" + command)) {
+
                             commandFound = true;
-                            const hasPermission = permission.checkPermission(res.body.properties.Sender, command);
+                            const hasPermission = permission.checkPermission(res.body.sender, command);
                             if(hasPermission) {
-                                if(loadedCommands[command]) return loadedCommands[command](connection, res.body);
+                                if(loadedCommands[command]) {
+                                    return loadedCommands[command](connection, res);
+                                }
+
+                                console.log("Loading sphere command")
+
                                 loadedCommands[command] = require(path.join(__dirname, "../commands", commands[command]));
-                                loadedCommands[command](connection, res.body);
+                                loadedCommands[command](connection, res);
                             } else
-                                commandError(connection, res.body.properties.Sender, `You do not have permission to use the '${command}' command`);
+                                commandError(connection, res.body.sender, `You do not have permission to use the '${command}' command`);
                         }
                     });
                     if(!commandFound)
-                        connection.send(prepareCommand(`tellraw ${res.body.properties.Sender} {"rawtext":[{"text":"§c[BuildTools] Unknown command '${res.body.properties.Message.split(" ")[0].slice(1)}'"}]}`));
+                        connection.send(prepareCommand(`tellraw ${res.body.sender} {"rawtext":[{"text":"§c[BuildTools] Unknown command '${res.body.message.split(" ")[0].slice(1)}'"}]}`));
                 }
             });
         });

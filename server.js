@@ -11,7 +11,6 @@ if(!fs.existsSync("./temp/errors.log")) fs.writeFileSync("./temp/errors.log", ""
 let wss = null;
 let idx = 0;
 
-
 const loader = setInterval(function() {
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
